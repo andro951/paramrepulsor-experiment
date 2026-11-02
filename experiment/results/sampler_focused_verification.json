@@ -1,0 +1,44 @@
+{
+  "source_commit": "be8df72b1ac9041be3aae3d99f16f0d392b492dc",
+  "modified_source_sha256": "46fdf58182af635915b354ca671b107c1552dc180988ba02ec7bbd00042cbeee",
+  "test_file": "experiment/tests/test_sampler.py",
+  "runs": [
+    {
+      "scope": "original test file before addition of exhaustive support test",
+      "passed": 32,
+      "seconds": 53.45
+    },
+    {
+      "scope": "test_tie_aware_support_matches_exhaustive_draw_orders",
+      "passed": 1,
+      "seconds": 15.44
+    }
+  ],
+  "total_distinct_cases_passed": 33,
+  "source_changed_between_runs": false,
+  "minimal_diff_apply_check": "passed",
+  "modified_git_diff_check": "passed",
+  "upstream_tracked_worktree": "clean",
+  "source_files_changed": [
+    "src/parampacmap/utils/data.py"
+  ],
+  "pristine_official_suite": {
+    "state": "blocked by sandbox IPC then interrupted",
+    "exit_code": 130,
+    "completed_assertions_reported": 0
+  },
+  "adapted_official_suite_logs": [
+    "results/upstream_suite_baseline_adapted.log",
+    "results/upstream_suite_modified_adapted.log"
+  ],
+  "adapted_official_suite_outcomes": {
+    "baseline": {
+      "passed": 7,
+      "seconds": 77.0
+    },
+    "modified": {
+      "passed": 7,
+      "seconds": 97.63
+    }
+  }
+}

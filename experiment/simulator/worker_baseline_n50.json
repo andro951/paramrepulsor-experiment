@@ -1,0 +1,14 @@
+{
+  "variant": "baseline",
+  "n": 50,
+  "seed": 42,
+  "epochs": 450,
+  "actual_saved_frames": 451,
+  "completed": true,
+  "input_point_ids_and_groups_exactly_preserved": true,
+  "every_frame_retains_original_row_order": true,
+  "observation_rng_invariance_checked_each_epoch": true,
+  "final_inference_matches_last_observer_frame": true,
+  "elapsed_seconds": 4.357537031173706,
+  "epoch_archives_temporary_only": true
+}

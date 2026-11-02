@@ -1,0 +1,85 @@
+{
+  "variant": "modified",
+  "n": 50,
+  "seed": 2,
+  "seconds": 17.29816618701443,
+  "initial_weights_sha256": "4a282c4bc1fac309900864878e0ef1e879581dc1a60fe69ef278b322cacf94e5",
+  "metrics": {
+    "silhouette": 0.9383953809738159,
+    "knn10_group_purity": 1.0,
+    "knn10_recall": 0.8539999999999999,
+    "trustworthiness10": 0.9856811594202899,
+    "distance_spearman": 0.8941856416302246,
+    "aligned_rms_score_units": 9.997111020004366
+  },
+  "audit": {
+    "NN": {
+      "self_pairs": 0,
+      "duplicate_excess": 0,
+      "nn_overlap": 500,
+      "same_group": 500,
+      "total": 500
+    },
+    "MN": {
+      "self_pairs": 0,
+      "duplicate_excess": 0,
+      "nn_overlap": 0,
+      "same_group": 94,
+      "total": 250
+    },
+    "FP": {
+      "self_pairs": 0,
+      "duplicate_excess": 0,
+      "nn_overlap": 0,
+      "same_group": 197,
+      "total": 1000
+    },
+    "mn_fp_overlap": 132
+  },
+  "alignment": {
+    "rotation_or_reflection": [
+      [
+        0.45810273941877927,
+        0.8888992519611036
+      ],
+      [
+        0.8888992519611036,
+        -0.4581027394187792
+      ]
+    ],
+    "scale": 0.4506770860758987,
+    "input_mean": [
+      72.50139991760254,
+      80.79240028381348
+    ],
+    "output_mean": [
+      2.089696959555149,
+      -35.63852598190308
+    ],
+    "reflection_allowed": true,
+    "reflection_used": true
+  },
+  "defaults": {
+    "n_neighbors": 10,
+    "n_MN": 5,
+    "n_FP": 20,
+    "num_epochs": 450,
+    "lr": 0.001,
+    "batch_size": 1024,
+    "model_dict": {
+      "backbone": "ANN",
+      "layer_size": [
+        100,
+        100,
+        100
+      ]
+    },
+    "apply_scale": null,
+    "apply_pca": true,
+    "optim_type": "Adam",
+    "weight_schedule": "paramrep_weight_schedule",
+    "const_schedule": "paramrep_const_schedule",
+    "num_workers": 1,
+    "dtype": "torch.float32"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "baseline_repository": "https://github.com/hyhuang00/ParamRepulsor",
+  "baseline_commit": "be8df72b1ac9041be3aae3d99f16f0d392b492dc",
+  "paper": "https://arxiv.org/abs/2411.15894",
+  "paper_pdf_sha256": "a0b9f6b879d0b127c96ff7baceaa806796457331343a8429cfc32c9432442293",
+  "input_library_file_id": "libfile_59b61f1348648191b85bb99fdd49d9cb",
+  "input_sha256": {
+    "inputs/ParamRepulsor_2D_Datasets.zip": "f3b9fb14b16eea8a2d0ad38ddc61cc6b61fc157d849f51c8768fb12ee5b6a652",
+    "inputs/datasets/README.md": "6e6214b40b1dd93b05b98cfbbad1c8a8d6170842e71a16ca7fd70ad639cc3f4d",
+    "inputs/datasets/paramrep_2d_100.csv": "5e8265ae7ddb73a66f347d06aec2ff0cbbe295db039412d928c59847727d0374",
+    "inputs/datasets/paramrep_2d_36.csv": "c2f77f8fe04ddf6a9e13de357785787f8646d406c9020f3aa70224f69a1bbd72",
+    "inputs/datasets/manifest.json": "9d798783d9ef92108a44ce4d08b76895a49f6303f126e0e0274a208b73820a43",
+    "inputs/datasets/paramrep_2d_50.csv": "2d4acf9a4a11cac338e4421d90006209aa7103d26868d54f45ecfff88b64a4aa"
+  },
+  "baseline_tracked_file_sha256": {
+    ".gitignore": "f49c06ff746e3d7eeeb1d16ec76a87b0f52e5fd013f7a1daca9a09aa5dd9032e",
+    "CONTRIBUTORS.md": "4e430b4fd50b613279de1157e59abfbb98b56eab24feea9457be0dd4d169103e",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "README.md": "f54b5ed7d83c5bd9cd747b27611034c6142bab4d8a4dc5369196672561d0638d",
+    "pyproject.toml": "9ce02fc957699d030c35fcca2151b4f2e92371f64e32ce3c0588c91aedfc7bae",
+    "requirements/requirements.aarch.txt": "2cbb1aab61464b6bcd2a62caaccbd384167448d852f62c4268792a2da115b4e4",
+    "requirements/requirements.cpu.txt": "2b3856df62840c11f7e753bb55a883774781fcce36d0bceb0bc3ce232bb83468",
+    "requirements/requirements.cu118.txt": "38f3fc74e30dd37d4cfb66c227bd783c6e7ecc2879fc5d207ae2efc63d7b4cdd",
+    "requirements/requirements.cu121.txt": "c43cc3ad4437f5c096cc29d68632744882b45da3b28d8e0844b0584dccd7a396",
+    "requirements/requirements.cu124.txt": "003332d55beb66348d9a1708b6e78232930cd885347bfbe172572ba0dd8f01fa",
+    "requirements/requirements.txt": "c83f0d2e784a712a0cc0cb721c891badf5607211819db2c2cc0e0352c85e3d9f",
+    "src/parampacmap/__init__.py": "0af750b32df1280c584f4984f5c7d2676f3e5a4f07dd4da05ca9ff2e2c3f8aee",
+    "src/parampacmap/models/__init__.py": "47e4ddadbd6ce67d6051eab3b9fc67e825072858634b7a9c39317cb52820e29c",
+    "src/parampacmap/models/dataset.py": "5dda156efb7533d3046b3d8b3d89e3f4994e3114e30995624754d587bfebbd61",
+    "src/parampacmap/models/module.py": "2740ae1f04bd6cecbfad6f38904887a695217e05fb2ab46eb402b14ede0e41e0",
+    "src/parampacmap/parampacmap.py": "aa6ce66d32a7cbcbc2fc96f0e45244769ca492ed3eab4f47ba9a211bccfaea15",
+    "src/parampacmap/training.py": "4d610de904c9169c21b4298422e29716d2144ec3240297e0a0e1f82efa2323df",
+    "src/parampacmap/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/parampacmap/utils/data.py": "462c06b331e9b841c7b16dac63c5e1a1c7b25b720c169bb1e7f3f06fb0fb9cf1",
+    "src/parampacmap/utils/utils.py": "3210ae73cab015cd0e017ac6d3664070be680e775d8ac49a51c16b95b3c28960",
+    "tests/test_reproducibility.py": "71a0b0e7b409ef7d88aa55f6c07d7ed7f9e5a4ba0da332863f08002feac5dfb3",
+    "tests/test_script.py": "0925588b2d1ca696d7af87bbc52e4747ff0c3efa42af1e125dc7e4b0a8ded445"
+  },
+  "modified_tracked_file_sha256": {
+    ".gitignore": "f49c06ff746e3d7eeeb1d16ec76a87b0f52e5fd013f7a1daca9a09aa5dd9032e",
+    "CONTRIBUTORS.md": "4e430b4fd50b613279de1157e59abfbb98b56eab24feea9457be0dd4d169103e",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "README.md": "f54b5ed7d83c5bd9cd747b27611034c6142bab4d8a4dc5369196672561d0638d",
+    "pyproject.toml": "9ce02fc957699d030c35fcca2151b4f2e92371f64e32ce3c0588c91aedfc7bae",
+    "requirements/requirements.aarch.txt": "2cbb1aab61464b6bcd2a62caaccbd384167448d852f62c4268792a2da115b4e4",
+    "requirements/requirements.cpu.txt": "2b3856df62840c11f7e753bb55a883774781fcce36d0bceb0bc3ce232bb83468",
+    "requirements/requirements.cu118.txt": "38f3fc74e30dd37d4cfb66c227bd783c6e7ecc2879fc5d207ae2efc63d7b4cdd",
+    "requirements/requirements.cu121.txt": "c43cc3ad4437f5c096cc29d68632744882b45da3b28d8e0844b0584dccd7a396",
+    "requirements/requirements.cu124.txt": "003332d55beb66348d9a1708b6e78232930cd885347bfbe172572ba0dd8f01fa",
+    "requirements/requirements.txt": "c83f0d2e784a712a0cc0cb721c891badf5607211819db2c2cc0e0352c85e3d9f",
+    "src/parampacmap/__init__.py": "0af750b32df1280c584f4984f5c7d2676f3e5a4f07dd4da05ca9ff2e2c3f8aee",
+    "src/parampacmap/models/__init__.py": "47e4ddadbd6ce67d6051eab3b9fc67e825072858634b7a9c39317cb52820e29c",
+    "src/parampacmap/models/dataset.py": "5dda156efb7533d3046b3d8b3d89e3f4994e3114e30995624754d587bfebbd61",
+    "src/parampacmap/models/module.py": "2740ae1f04bd6cecbfad6f38904887a695217e05fb2ab46eb402b14ede0e41e0",
+    "src/parampacmap/parampacmap.py": "aa6ce66d32a7cbcbc2fc96f0e45244769ca492ed3eab4f47ba9a211bccfaea15",
+    "src/parampacmap/training.py": "4d610de904c9169c21b4298422e29716d2144ec3240297e0a0e1f82efa2323df",
+    "src/parampacmap/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/parampacmap/utils/data.py": "46fdf58182af635915b354ca671b107c1552dc180988ba02ec7bbd00042cbeee",
+    "src/parampacmap/utils/utils.py": "3210ae73cab015cd0e017ac6d3664070be680e775d8ac49a51c16b95b3c28960",
+    "tests/test_reproducibility.py": "71a0b0e7b409ef7d88aa55f6c07d7ed7f9e5a4ba0da332863f08002feac5dfb3",
+    "tests/test_script.py": "0925588b2d1ca696d7af87bbc52e4747ff0c3efa42af1e125dc7e4b0a8ded445"
+  },
+  "changed_source_files": [
+    "src/parampacmap/utils/data.py"
+  ],
+  "python": "3.11.17",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "cpu_count_visible": 9,
+  "quality_trials": {
+    "datasets": [
+      36,
+      50,
+      100
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "variants": [
+      "upstream",
+      "modified"
+    ],
+    "total": 60,
+    "illustrative_seed": 0,
+    "outcome_selection": "all outcomes retained; illustrative seed0 fixed before outcome inspection"
+  },
+  "runtime_adapter": "experiment/run_trial.py: inference-only, single original batch in-process because sandbox denies PyTorch worker IPC; identical arms",
+  "publication": "none; no upstream push or public deployment"
+}

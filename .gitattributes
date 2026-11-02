@@ -1,0 +1,3 @@
+# Preserve the exact delivered source/data bytes and their provenance hashes.
+# In particular, do not convert the pinned upstream tree's line endings.
+* -text

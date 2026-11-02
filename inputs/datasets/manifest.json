@@ -1,0 +1,92 @@
+{
+  "title": "ParamRepulsor 2D sampling stress-test datasets",
+  "generated_by": "Synthetic deterministic generator",
+  "random_seed": 4612026,
+  "input_dimensions": 2,
+  "intended_output_dimensions": 2,
+  "axes": [
+    "math_score",
+    "english_score"
+  ],
+  "csv_columns": [
+    "point_id",
+    "math_score",
+    "english_score",
+    "group"
+  ],
+  "fit_feature_columns": [
+    "math_score",
+    "english_score"
+  ],
+  "group_column": "group (evaluation/plotting only; not a training feature)",
+  "subsets_nested": true,
+  "subset_group_counts": {
+    "36": {
+      "High Both": 11,
+      "Math Strong": 12,
+      "English Strong": 13
+    },
+    "50": {
+      "High Both": 11,
+      "Math Strong": 14,
+      "English Strong": 25
+    },
+    "100": {
+      "High Both": 11,
+      "Low Both": 11,
+      "Math Strong": 38,
+      "English Strong": 40
+    }
+  },
+  "clusters": {
+    "High Both": {
+      "count_in_100": 11,
+      "center_math": 88.0,
+      "center_english": 88.0,
+      "maximum_radius": 5.3
+    },
+    "Low Both": {
+      "count_in_100": 11,
+      "center_math": 49.0,
+      "center_english": 49.0,
+      "maximum_radius": 5.3
+    },
+    "Math Strong": {
+      "count_in_100": 38,
+      "center_math": 91.0,
+      "center_english": 55.0,
+      "maximum_radius": 5.3
+    },
+    "English Strong": {
+      "count_in_100": 40,
+      "center_math": 55.0,
+      "center_english": 91.0,
+      "maximum_radius": 5.3
+    }
+  },
+  "checks": {
+    "36": {
+      "cross_group_matches_in_plain_euclidean_10_nearest_neighbors": 0,
+      "minimum_intergroup_euclidean_distance": 24.858,
+      "max_10th_nearest_distance": 9.416
+    },
+    "50": {
+      "cross_group_matches_in_plain_euclidean_10_nearest_neighbors": 0,
+      "minimum_intergroup_euclidean_distance": 24.825,
+      "max_10th_nearest_distance": 8.073
+    },
+    "100": {
+      "cross_group_matches_in_plain_euclidean_10_nearest_neighbors": 0,
+      "minimum_intergroup_euclidean_distance": 24.825,
+      "max_10th_nearest_distance": 9.578
+    }
+  },
+  "notes": [
+    "All 36-point rows appear unchanged in the 50-point and 100-point files; all 50-point rows appear unchanged in the 100-point file.",
+    "The 100-point set adds a fourth group, so comparing group preservation across sizes is not a pure controlled change in N.",
+    "The two score columns are both in 0\u2013100 units. These are synthetic values, not real student data.",
+    "All 10 nearest neighbors by plain Euclidean distance belong to the same cluster at each size. Actual ParamRepulsor NN selection also applies local-distance scaling.",
+    "A 36-point set is the cardinality minimum for 1 anchor + 10 unique NN + 5 distinct nonoverlapping MN + 20 distinct FP; additional distance-order constraints are not guaranteed feasible.",
+    "No ParamRepulsor training or before/after comparisons have been run yet."
+  ]
+}

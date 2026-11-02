@@ -1,0 +1,10 @@
+# Windows Python 3.10 dependency set. CPU torch==2.5.1 is installed separately.
+# Preserve the experiment's core numerical versions; resolve other packages
+# to versions supporting Python 3.10, then record the exact local freeze.
+annoy==1.17.3
+numba==0.60.0
+numpy==2.0.2
+scikit-learn>=0.20
+pandas
+matplotlib
+pytest

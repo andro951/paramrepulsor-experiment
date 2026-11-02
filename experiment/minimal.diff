@@ -1,0 +1,253 @@
+--- a/src/parampacmap/utils/data.py
++++ b/src/parampacmap/utils/data.py
+@@ -25,6 +25,10 @@
+         tree: Annoy index
+     """
+     n, dim = X.shape
++    if any(int(count) != count or count < 0 for count in (n_neighbors, n_MN, n_FP)):
++        raise ValueError("Pair counts must be nonnegative integers")
++    if n_neighbors >= n:
++        raise ValueError("n_neighbors must be smaller than the dataset size")
+     # sample more neighbors than needed
+     n_neighbors_extra = min(n_neighbors + 50, n - 1)
+     tree = AnnoyIndex(dim, metric=distance)
+@@ -53,10 +57,12 @@
+     X = X.astype(np.float32)
+     pair_neighbors = sample_neighbors_pair(X, scaled_dist, nbrs, np.int32(n_neighbors))
+     if random_state is None:
+-        pair_MN = sample_MN_pair(X, np.int32(n_MN), np.int32(option))
++        pair_MN = sample_MN_pair(X, pair_neighbors, n_neighbors, np.int32(n_MN), np.int32(option))
+         pair_FP = sample_FP_pair(X, pair_neighbors, n_neighbors, n_FP)
+     else:
+-        pair_MN = sample_MN_pair_deterministic(X, np.int32(n_MN), random_state, option)
++        pair_MN = sample_MN_pair_deterministic(
++            X, pair_neighbors, n_neighbors, np.int32(n_MN), random_state, option
++        )
+         pair_FP = sample_FP_pair_deterministic(
+             X, pair_neighbors, n_neighbors, np.int32(n_FP), random_state
+         )
+@@ -158,23 +164,23 @@
+         return hamming_dist(x1, x2)
+ 
+ 
++@numba.njit(nogil=True)
++def _candidate_pool(maximum, reject_ind):
++    eligible = np.ones(maximum, dtype=np.bool_)
++    for j in reject_ind:
++        if j < 0 or j >= maximum:
++            raise ValueError("Excluded point index is out of range")
++        eligible[j] = False
++    return np.where(eligible)[0].astype(np.int32)
++
++
+ @numba.njit("i4[:](i4,i4,i4[:])", nogil=True)
+ def sample_FP(n_samples, maximum, reject_ind):
+-    result = np.empty(n_samples, dtype=np.int32)
+-    for i in range(n_samples):
+-        reject_sample = True
+-        while reject_sample:
+-            j = np.random.randint(maximum)
+-            for k in range(i):
+-                if j == result[k]:
+-                    break
+-            for k in range(reject_ind.shape[0]):
+-                if j == reject_ind[k]:
+-                    break
+-            else:
+-                reject_sample = False
+-        result[i] = j
+-    return result
++    """Uniform distinct samples from the points not in reject_ind."""
++    candidates = _candidate_pool(maximum, reject_ind)
++    if n_samples < 0 or n_samples > candidates.size:
++        raise ValueError("Not enough eligible points for distinct FP partners")
++    return np.random.choice(candidates, n_samples, replace=False)
+ 
+ 
+ @numba.njit("i4[:,:](f4[:,:],f4[:,:],i4[:,:],i4)", parallel=True, nogil=True)
+@@ -204,85 +210,120 @@
+     return pair_neighbors
+ 
+ 
+-@numba.njit("i4[:,:](f4[:,:],i4,i4)", nogil=True)
+-def sample_MN_pair(X, n_MN, option=0):
+-    """Sample Mid Near pairs."""
+-    n = X.shape[0]
+-    pair_MN = np.empty((n * n_MN, 2), dtype=np.int32)
+-    for i in numba.prange(n):
+-        for jj in range(n_MN):
+-            sampled = np.random.randint(0, n, 6)
+-            dist_list = np.empty((6), dtype=np.float32)
+-            for t in range(sampled.shape[0]):
+-                dist_list[t] = calculate_dist(
+-                    X[i], X[sampled[t]], distance_index=option
+-                )
+-            min_dic = np.argmin(dist_list)
+-            dist_list = np.delete(dist_list, [min_dic])
+-            sampled = np.delete(sampled, [min_dic])
+-            picked = sampled[np.argmin(dist_list)]
+-            pair_MN[i * n_MN + jj][0] = i
+-            pair_MN[i * n_MN + jj][1] = picked
+-    return pair_MN
++@numba.njit(nogil=True)
++def _second_closest(X, anchor, sampled, option):
++    dist_list = np.empty(6, dtype=np.float32)
++    for t in range(6):
++        dist_list[t] = calculate_dist(X[anchor], X[sampled[t]], option)
++    # Preserve the original first-occurrence tie handling within each draw.
++    first = np.argmin(dist_list)
++    dist_list = np.delete(dist_list, first)
++    sampled = np.delete(sampled, first)
++    return sampled[np.argmin(dist_list)]
++
++
++@numba.njit(nogil=True)
++def _check_MN_support(X, anchor, candidates, n_MN, option):
++    m = candidates.size
++    if n_MN == 0:
++        return
++    if m < 6:
++        raise ValueError("MN sampling requires at least six eligible points")
++    # With strict distances, only ranks 2 through m-4 can be second of six.
++    # Ties can enlarge this support; check them only at the cardinality edge.
++    if n_MN <= m - 5:
++        return
++    distances = np.empty(m, dtype=np.float32)
++    for j in range(m):
++        distances[j] = calculate_dist(X[anchor], X[candidates[j]], option)
++    ordered = np.sort(distances)
++    support = 0
++    lo = 0
++    while lo < m:
++        hi = lo + 1
++        while hi < m and ordered[hi] == ordered[lo]:
++            hi += 1
++        equal_others = hi - lo - 1
++        higher = m - hi
++        if ((lo > 0 and higher + equal_others >= 4) or
++                (equal_others > 0 and higher + equal_others >= 5)):
++            support += hi - lo
++        lo = hi
++    if n_MN > support:
++        raise ValueError("Not enough possible second-of-six points for distinct MN partners")
+ 
+ 
+-@numba.njit("i4[:,:](f4[:,:],i4,i4,i4)", nogil=True)
+-def sample_MN_pair_deterministic(X, n_MN, random_state, option=0):
+-    """Sample Mid Near pairs using the given random state."""
++@numba.njit(nogil=True)
++def _sample_MN_pair(X, pair_neighbors, n_neighbors, n_MN, random_state, option):
+     n = X.shape[0]
++    if n_MN < 0:
++        raise ValueError("n_MN must be nonnegative")
+     pair_MN = np.empty((n * n_MN, 2), dtype=np.int32)
+-    for i in numba.prange(n):
++    for i in range(n):
++        reject = np.empty(n_neighbors + 1, dtype=np.int32)
++        reject[:n_neighbors] = pair_neighbors[i * n_neighbors:(i + 1) * n_neighbors, 1]
++        reject[n_neighbors] = i
++        candidates = _candidate_pool(n, reject)
++        _check_MN_support(X, i, candidates, n_MN, option)
+         for jj in range(n_MN):
+-            # Shifting the seed to prevent sampling the same pairs
+-            np.random.seed(random_state + i * n_MN + jj)
+-            sampled = np.random.randint(0, n, 6)
+-            dist_list = np.empty((6), dtype=np.float32)
+-            for t in range(sampled.shape[0]):
+-                dist_list[t] = calculate_dist(
+-                    X[i], X[sampled[t]], distance_index=option
+-                )
+-            min_dic = np.argmin(dist_list)
+-            dist_list = np.delete(dist_list, [min_dic])
+-            sampled = np.delete(sampled, [min_dic])
+-            picked = sampled[np.argmin(dist_list)]
+-            pair_MN[i * n_MN + jj][0] = i
+-            pair_MN[i * n_MN + jj][1] = picked
++            if random_state >= 0:
++                np.random.seed(random_state + i * n_MN + jj)
++            # Previous final MNs deliberately remain in candidates. Retry a whole
++            # six-distinct draw if its second-closest point was selected before.
++            for attempt in range(100000):
++                sampled = np.random.choice(candidates, 6, replace=False)
++                picked = _second_closest(X, i, sampled, option)
++                if picked not in pair_MN[i * n_MN:i * n_MN + jj, 1]:
++                    pair_MN[i * n_MN + jj, 0] = i
++                    pair_MN[i * n_MN + jj, 1] = picked
++                    break
++            else:
++                raise RuntimeError("MN retry limit reached; no sampling fallback was used")
+     return pair_MN
+ 
+ 
+-@numba.njit("i4[:,:](f4[:,:],i4[:,:],i4,i4)", parallel=True, nogil=True)
+-def sample_FP_pair(X, pair_neighbors, n_neighbors, n_FP):
+-    """Sample Further pairs."""
++@numba.njit(nogil=True)
++def sample_MN_pair(X, pair_neighbors, n_neighbors, n_MN, option=0):
++    """Sample distinct final MNs, rejecting entire repeated-result draws."""
++    return _sample_MN_pair(X, pair_neighbors, n_neighbors, n_MN, -1, option)
++
++
++@numba.njit(nogil=True)
++def sample_MN_pair_deterministic(X, pair_neighbors, n_neighbors, n_MN, random_state, option=0):
++    """Identical MN rules, with the original per-partner seed offsets."""
++    return _sample_MN_pair(X, pair_neighbors, n_neighbors, n_MN, random_state, option)
++
++
++@numba.njit(nogil=True)
++def _sample_FP_pair(X, pair_neighbors, n_neighbors, n_FP, random_state):
+     n = X.shape[0]
++    if n_FP < 0:
++        raise ValueError("n_FP must be nonnegative")
+     pair_FP = np.empty((n * n_FP, 2), dtype=np.int32)
+-    for i in numba.prange(n):
+-        for k in numba.prange(n_FP):
+-            FP_index = sample_FP(
+-                n_FP,
+-                n,
+-                pair_neighbors[i * n_neighbors : i * n_neighbors + n_neighbors, 1],
+-            )
+-            pair_FP[i * n_FP + k][0] = i
+-            pair_FP[i * n_FP + k][1] = FP_index[k]
++    for i in range(n):
++        reject = np.empty(n_neighbors + 1, dtype=np.int32)
++        reject[:n_neighbors] = pair_neighbors[i * n_neighbors:(i + 1) * n_neighbors, 1]
++        reject[n_neighbors] = i
++        if random_state >= 0:
++            np.random.seed(random_state + i * n_FP)
++        # One without-replacement draw per anchor, not a fresh draw per column.
++        FP_index = sample_FP(n_FP, n, reject)
++        for k in range(n_FP):
++            pair_FP[i * n_FP + k, 0] = i
++            pair_FP[i * n_FP + k, 1] = FP_index[k]
+     return pair_FP
+ 
+ 
+-@numba.njit("i4[:,:](f4[:,:],i4[:,:],i4,i4,i4)", parallel=True, nogil=True)
++@numba.njit(nogil=True)
++def sample_FP_pair(X, pair_neighbors, n_neighbors, n_FP):
++    """Sample distinct FP partners; MN/FP overlap is intentionally allowed."""
++    return _sample_FP_pair(X, pair_neighbors, n_neighbors, n_FP, -1)
++
++
++@numba.njit(nogil=True)
+ def sample_FP_pair_deterministic(X, pair_neighbors, n_neighbors, n_FP, random_state):
+-    """Sample Further pairs using the given random state."""
+-    n = X.shape[0]
+-    pair_FP = np.empty((n * n_FP, 2), dtype=np.int32)
+-    for i in numba.prange(n):
+-        for k in numba.prange(n_FP):
+-            np.random.seed(random_state + i * n_FP + k)
+-            FP_index = sample_FP(
+-                n_FP,
+-                n,
+-                pair_neighbors[i * n_neighbors : i * n_neighbors + n_neighbors, 1],
+-            )
+-            pair_FP[i * n_FP + k][0] = i
+-            pair_FP[i * n_FP + k][1] = FP_index[k]
+-    return pair_FP
++    """Identical FP rules with an anchor-specific seed."""
++    return _sample_FP_pair(X, pair_neighbors, n_neighbors, n_FP, random_state)
+ 
+ 
+ @numba.njit("f4[:,:](f4[:,:],f4[:],i4[:,:])", parallel=True, nogil=True)

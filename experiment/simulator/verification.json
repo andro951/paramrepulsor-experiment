@@ -1,0 +1,141 @@
+{
+  "scope": "Local actual-training Start-button viewer; no hosted site and no user desktop used.",
+  "date": "2026-11-01",
+  "passed": {
+    "server_control_unit_tests": 6,
+    "ui_logic_minimal_dom": "Start, duplicate click protection, completed restart, SVG point and ID rendering, label toggle, validation, backend error, network error",
+    "javascript_syntax": true,
+    "python_compile": true,
+    "real_http_training": {
+      "baseline": {
+        "dataset_n": 36,
+        "seed": 42,
+        "epochs_per_run": 450,
+        "independent_runs": 2,
+        "saved_actual_frames_per_run": 451,
+        "same_seed_final_coordinates_exactly_equal": true,
+        "repeated_start_while_active_rejected": true,
+        "restart_after_completion_success": true
+      },
+      "modified": {
+        "dataset_n": 36,
+        "seed": 42,
+        "epochs_per_run": 450,
+        "independent_runs": 2,
+        "saved_actual_frames_per_run": 451,
+        "same_seed_final_coordinates_exactly_equal": true,
+        "repeated_start_while_active_rejected": true,
+        "restart_after_completion_success": true
+      }
+    },
+    "observer_neutrality": {
+      "baseline": {
+        "dataset_n": 36,
+        "seed": 42,
+        "observed_final_bitwise_equal_to_unobserved_training": true,
+        "every_observation_preserves_torch_rng": true,
+        "archive_epochs_exactly_0_through_450": true,
+        "each_frame_retains_original_row_order": true
+      },
+      "modified": {
+        "dataset_n": 36,
+        "seed": 42,
+        "observed_final_bitwise_equal_to_unobserved_training": true,
+        "every_observation_preserves_torch_rng": true,
+        "archive_epochs_exactly_0_through_450": true,
+        "each_frame_retains_original_row_order": true
+      }
+    },
+    "additional_real_worker_cases": [
+      {
+        "variant": "baseline",
+        "n": 50,
+        "seed": 42,
+        "epochs": 450,
+        "actual_saved_frames": 451,
+        "completed": true,
+        "input_point_ids_and_groups_exactly_preserved": true,
+        "every_frame_retains_original_row_order": true,
+        "observation_rng_invariance_checked_each_epoch": true,
+        "final_inference_matches_last_observer_frame": true,
+        "elapsed_seconds": 4.357537031173706,
+        "epoch_archives_temporary_only": true
+      },
+      {
+        "variant": "baseline",
+        "n": 100,
+        "seed": 42,
+        "epochs": 450,
+        "actual_saved_frames": 451,
+        "completed": true,
+        "input_point_ids_and_groups_exactly_preserved": true,
+        "every_frame_retains_original_row_order": true,
+        "observation_rng_invariance_checked_each_epoch": true,
+        "final_inference_matches_last_observer_frame": true,
+        "elapsed_seconds": 7.114015340805054,
+        "epoch_archives_temporary_only": true
+      },
+      {
+        "variant": "modified",
+        "n": 50,
+        "seed": 42,
+        "epochs": 450,
+        "actual_saved_frames": 451,
+        "completed": true,
+        "input_point_ids_and_groups_exactly_preserved": true,
+        "every_frame_retains_original_row_order": true,
+        "observation_rng_invariance_checked_each_epoch": true,
+        "final_inference_matches_last_observer_frame": true,
+        "elapsed_seconds": 18.66963267326355,
+        "epoch_archives_temporary_only": true
+      },
+      {
+        "variant": "modified",
+        "n": 100,
+        "seed": 42,
+        "epochs": 450,
+        "actual_saved_frames": 451,
+        "completed": true,
+        "input_point_ids_and_groups_exactly_preserved": true,
+        "every_frame_retains_original_row_order": true,
+        "observation_rng_invariance_checked_each_epoch": true,
+        "final_inference_matches_last_observer_frame": true,
+        "elapsed_seconds": 18.278198719024658,
+        "epoch_archives_temporary_only": true
+      }
+    ]
+  },
+  "limits": {
+    "browser_visual_qa": "BLOCKED: /usr/bin/chromium launch aborted at process_singleton_posix.cc with socket() failed: Operation not permitted (EPERM). No permission workaround or desktop use attempted. Minimal-DOM UI checks are not browser/rendered-layout QA.",
+    "other_dataset_sizes": "All three actual worker dataset paths completed 450 epochs for baseline and modified. Full live HTTP Start/restart and exact observed-versus-unobserved comparisons were separately checked at N36 only; no browser/rendered-layout QA is claimed.",
+    "inference_transport_adapter": "Cloud runtime blocks multiprocessing DataLoader Unix IPC. Both variants use an identical direct in-process final inference adapter on the same <=100-row original single batch; no training loop, model, optimizer, loss, schedule or hyperparameter modifications.",
+    "arbitrary_embedding_axes": "UI shows raw initial/current model coordinates with explicit arbitrary translation/rotation/scale warning and expanding viewport. No alignment or physical-motion claim.",
+    "live_polling": "Displayed epochs may be skipped when training is fast; archive records all actual epoch frames, with no interpolation.",
+    "http_ui_restart_tested_dataset_sizes": [
+      36
+    ],
+    "additional_worker_archives": "N50/N100 checks used TemporaryDirectory; full epoch archives were removed after checking and only small summaries were retained.",
+    "tested_worker_dataset_sizes": [
+      36,
+      50,
+      100
+    ],
+    "tested_live_http_dataset_sizes": [
+      36
+    ]
+  },
+  "evidence_files": [
+    "verified_baseline.json",
+    "verified_modified.json",
+    "observer_baseline.json",
+    "observer_modified.json",
+    "unit_tests.log",
+    "worker_baseline_n50.json",
+    "worker_baseline_n100.json",
+    "worker_modified_n50.json",
+    "worker_modified_n100.json"
+  ],
+  "run_command": ".venv/bin/python experiment/simulator/server.py",
+  "url": "http://127.0.0.1:8765",
+  "layout": "Package root contains upstream/src, modified/src, inputs/datasets, experiment/simulator."
+}

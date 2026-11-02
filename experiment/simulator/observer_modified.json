@@ -1,0 +1,10 @@
+{
+  "variant": "modified",
+  "n": 36,
+  "seed": 42,
+  "epochs": 450,
+  "actual_saved_frames": 451,
+  "observer_final_exactly_matches_unobserved_training": true,
+  "each_frame_preserves_row_identity": true,
+  "observation_rng_invariance_checked_each_epoch": true
+}

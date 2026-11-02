@@ -1,0 +1,44 @@
+# Local environments, caches and build products
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+*.egg-info/
+build/
+dist/
+
+# Machine-local backups, repeated QA recordings and logs stay on disk
+/windows-backups/
+/windows-verification/
+/WINDOWS-README.txt
+/verify_startup.py
+*.log
+*.tmp
+*.bak
+*.layout.tmp
+*.grouped.tmp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Credentials and machine-specific configuration
+.env
+.env.*
+*.pem
+*.p12
+*.pfx
+*.key
+credentials.json
+.aws/
+.codex/
+.agents/
+.idea/
+.vscode/
+
+# Runtime recordings belong in the local temporary run directory
+frames.jsonl
+training.log

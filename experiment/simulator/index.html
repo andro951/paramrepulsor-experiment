@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ParamRepulsor · actual training viewer</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#17322e;background:#edf3f0;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1320px;margin:auto;padding:36px 30px 28px}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.15em;text-transform:uppercase;color:#527267}h1{font-size:clamp(26px,3vw,38px);line-height:1.15;letter-spacing:-.04em;margin:9px 0 13px}.intro{max-width:850px;color:#50645d;font-size:15px;line-height:1.6;margin-bottom:25px}.controls{display:flex;gap:14px;align-items:end;flex-wrap:wrap;background:#fff;border:1px solid #d9e5df;border-radius:16px;padding:18px 20px;box-shadow:0 4px 15px #17322e04}label{font-size:12px;font-weight:700;color:#587168;display:flex;flex-direction:column;gap:7px}select,input{font:inherit;font-size:14px;border:1px solid #cbdcd3;border-radius:8px;padding:10px 12px;color:#17322e;background:#fbfdfc;min-height:42px}input{width:115px}button{font:inherit;font-size:14px;font-weight:700;color:#fff;background:#196a4b;border:0;padding:12px 22px;min-height:43px;border-radius:9px;cursor:pointer}button:hover{background:#10573b}button:disabled{cursor:default;background:#92ada0}.checkbox{display:flex;flex-direction:row;align-items:center;margin:auto 0 10px auto;white-space:nowrap}.checkbox input{min-height:0;width:auto;accent-color:#196a4b}.progress{display:flex;justify-content:space-between;align-items:center;margin:23px 1px 10px;font-size:13px;gap:10px}#status{font-weight:700}#detail{color:#6a7e74}progress{width:100%;height:6px;accent-color:#196a4b;display:block;border:0}.charts{display:grid;grid-template-columns:1fr;gap:20px;margin-top:21px}.panel{background:white;border:1px solid #d9e5df;border-radius:16px;overflow:hidden}.panel h2{font-size:16px;letter-spacing:-.015em;margin:21px 23px 5px}.panel p{color:#6b7d75;font-size:12px;margin:0 23px;line-height:1.5;min-height:36px}svg{display:block;width:100%;height:auto;aspect-ratio:1.2}.legend{display:flex;flex-wrap:wrap;gap:18px;margin:19px 3px;font-size:12px;color:#425e52}.key{display:inline-flex;gap:7px;align-items:center}.swatch{display:inline-block;height:10px;width:10px;border-radius:50%}.note{padding:17px 20px;border:1px solid #d3e2d9;border-radius:12px;background:#e6eee8;line-height:1.65;color:#51695d;font-size:12px}.note strong{color:#294f3d}#error{color:#a63327;font-size:14px;margin-top:15px;white-space:pre-wrap}footer{color:#71837a;font-size:11px;margin:17px 3px}.raw{font:10px ui-monospace,monospace;fill:#5e7768}.axis{font:12px system-ui;fill:#496657}.ids{font:8px ui-monospace,monospace;fill:#344b40;paint-order:stroke;stroke:#fff;stroke-width:2.2px;stroke-linejoin:round}.empty{font:14px system-ui;fill:#7e9286}@media(max-width:750px){main{padding:25px 15px}.charts{grid-template-columns:1fr}.checkbox{margin-left:0}.controls{gap:12px}.progress{align-items:start;flex-direction:column}h1{font-size:29px}}
+
+main{max-width:1600px;padding:26px 22px 24px}.intro{margin-bottom:18px}.charts{gap:16px;margin-top:16px;align-items:start}.panel h2{margin:16px 18px 5px}.panel p{margin:0 18px;min-height:43px}.panel>svg{aspect-ratio:auto}.ids{font-size:7.5px;stroke-width:1.6px}.mark-legend{display:flex;align-items:center;flex-wrap:wrap;gap:20px;margin:15px 3px 0;font-size:12px;color:#425e52}.mark-legend svg{width:32px;height:14px;aspect-ratio:auto}.original-key{display:inline-block;width:11px;height:11px;border:1px solid #9cb3a7;border-radius:50%;background:#f5f8f6}.current-key{display:inline-block;width:6px;height:6px;border-radius:50%;background:#355c4c}.legend{margin:12px 3px 15px}.note{line-height:1.55}@media(max-width:750px){main{padding:22px 12px}.panel p{min-height:0;margin-bottom:6px}.mark-legend{gap:12px}}
+.secondary{background:#fff;color:#196a4b;border:1px solid #b8cec1}.secondary:hover{background:#edf4ef}.phase-note{font-size:12px;line-height:1.55;color:#587168;margin:9px 2px 0;min-height:37px}.check-key{display:inline-block;width:11px;height:11px;border:2px solid #ba850b;border-radius:50%}[hidden]{display:none!important}
+main{max-width:none;width:100%}.charts{grid-template-columns:minmax(0,1fr);width:100%}.charts>.panel{width:100%;min-width:0}.epoch-progress{margin:13px 18px 0;display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;color:#294f3d}#demo-status-block .progress{margin-top:2px}
+.panel>svg{--plot-max-height:clamp(120px,calc(100dvh - 180px),900px);width:min(100%,calc(var(--plot-max-height) * var(--plot-ratio,1)));height:auto;max-width:100%;max-height:var(--plot-max-height);margin-inline:auto;object-fit:contain}.raw{font-size:12px}.axis{font-size:14px}
+</style>
+<main>
+<div class="eyebrow">ParamRepulsor · local experiment</div>
+<h1>Watch the real training unfold.</h1>
+<p class="intro">Input appears immediately. Start computes the real selected sampler and all 450 training epochs. Output shows each anchor with all of its actual NN/MN/FP selections together, followed by genuine epoch states. This is not an interpolated animation. The whole-demo target is an estimate; edit its seconds field even during playback.</p>
+<div class="controls">
+<label>Implementation<select id="variant"><option value="baseline">Released baseline</option><option value="modified">Modified sampler</option></select></label>
+<label>Dataset<select id="n"><option value="36">36 points</option><option value="50">50 points</option><option value="100">100 points</option></select></label>
+<label>Random seed<input id="seed" type="number" min="0" max="2147383647" step="1" value="42"></label>
+<label>Whole demo target (seconds)<input id="seconds" type="number" min="0" step="any" value="90" title="Estimated total, including setup. You can change this during replay."></label>
+<button id="start" type="button">Start training</button>
+<button id="reset" type="button" class="secondary">Reset / stop</button>
+<label class="checkbox"><input id="labels" type="checkbox"> Point IDs (hide overlaps)</label>
+</div>
+<div id="error" role="alert" hidden></div>
+<div class="charts">
+<section class="panel" id="input-panel"><h2>Fixed input dataset</h2><p>Only the two score columns are training features. Colors are known groups for display, not labels supplied to the model.</p><svg id="input" viewBox="0 0 720 620" aria-label="Input dataset, Math score versus English score" role="img"></svg></section>
+<div id="demo-status-block"><div class="progress" aria-live="polite"><span id="status">Ready to train</span><span id="detail">450 epochs · 10 NN / 5 MN / 20 FP · CPU</span></div>
+
+<p id="phase-note" class="phase-note" aria-live="polite"></p>
+</div>
+<section class="panel" id="output-panel"><h2 id="output-title">Actual pair selection</h2><p id="embedding-caption">Faint rings: true original scores. Solid dots: current raw embedding. Faint lines connect the same point ID; neither set of coordinates is aligned or transformed.</p><div class="epoch-progress"><span id="epoch-count" aria-live="polite">Epoch 0 / 450</span><progress id="progress" max="450" value="0" aria-label="Completed training epochs"></progress></div><svg id="output" viewBox="0 0 720 620" aria-label="True original scores and current raw embedding on shared numeric axes" role="img"></svg></section>
+</div>
+<div class="mark-legend" id="training-key" aria-label="Training plot symbols">
+<span class="key"><span class="original-key"></span>True original input</span>
+<span class="key"><svg width="32" height="14" viewBox="0 0 32 14" aria-hidden="true"><line x1="1" y1="7" x2="31" y2="7" stroke="#54766b" stroke-opacity=".35"/></svg>Same point ID</span>
+<span class="key"><span class="current-key"></span>Current / final raw output</span>
+</div>
+<div class="mark-legend" id="selection-key" aria-label="Pair selection symbols"><span class="key"><span class="swatch" style="background:rgb(147,89,190)"></span>Anchor</span><span class="key"><span class="swatch" style="background:rgb(93,205,170)"></span>Nearest neighbors (NN)</span><span class="key"><span class="swatch" style="background:rgb(255,171,56)"></span>Mid-near (MN)</span><span class="key"><span class="swatch" style="background:rgb(110,181,232)"></span>Far (FP)</span><span class="key">Multiple rings = shared memberships</span></div>
+<div class="legend" id="legend"></div>
+<div class="note"><strong>Selection is paced recorded replay:</strong> each purple anchor shows all of its real NN, MN and FP partners simultaneously, from the unchanged sampler's returned arrays. Candidate-by-candidate checking is not animated. Multi-rings and separate colored connections preserve shared memberships, including source/self selections; counts and hover text retain repeated slots. Input group colors never change. <strong>During training, two coordinate spaces share one numeric display:</strong> faint rings on the right are the true original Math/English scores; solid dots are actual current model outputs. Lines show point-ID correspondence, <strong>not a meaningful distance or physical trajectory</strong> between these different spaces. Raw embeddings have arbitrary translation, rotation and scale. Neither inputs nor outputs are aligned, normalized or transformed here. The view fits only true inputs and current outputs; initial-network positions are not shown. Hover any point for its ID; optional labels hide overlaps. All 451 genuine states are replayed in order and saved locally; a delayed or hidden browser can extend the estimated presentation time. Neither implementation is presumed better.</div>
+<footer>Local-only viewer · exact datasets and point identities · original model, optimizer, loss, schedules and 450-epoch training loop</footer>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const palette={'High Both':'#2779a7','Low Both':'#956bc1','Math Strong':'#df8135','English Strong':'#2e9b72'};
+const previewDatasets={"36":[{"point_id":"P001","group":"High Both","x":88.93000030517578,"y":85.7300033569336},{"point_id":"P002","group":"High Both","x":88.4800033569336,"y":91.72000122070312},{"point_id":"P003","group":"High Both","x":86.02999877929688,"y":90.94000244140625},{"point_id":"P004","group":"High Both","x":90.2300033569336,"y":88.33000183105469},{"point_id":"P005","group":"High Both","x":90.16999816894531,"y":91.37999725341797},{"point_id":"P006","group":"High Both","x":88.94999694824219,"y":92.97000122070312},{"point_id":"P007","group":"High Both","x":87.44000244140625,"y":85.08000183105469},{"point_id":"P008","group":"High Both","x":84.55000305175781,"y":91.26000213623047},{"point_id":"P009","group":"High Both","x":91.79000091552734,"y":89.43000030517578},{"point_id":"P010","group":"High Both","x":92.19999694824219,"y":90.80999755859375},{"point_id":"P011","group":"High Both","x":90.77999877929688,"y":92.43000030517578},{"point_id":"P023","group":"Math Strong","x":88.45999908447266,"y":54.560001373291016},{"point_id":"P024","group":"Math Strong","x":91.20999908447266,"y":52.7400016784668},{"point_id":"P025","group":"Math Strong","x":88.5999984741211,"y":56.400001525878906},{"point_id":"P026","group":"Math Strong","x":94.30999755859375,"y":51.869998931884766},{"point_id":"P027","group":"Math Strong","x":93.43000030517578,"y":52.290000915527344},{"point_id":"P028","group":"Math Strong","x":89.13999938964844,"y":54.40999984741211},{"point_id":"P029","group":"Math Strong","x":90.69000244140625,"y":59.86000061035156},{"point_id":"P030","group":"Math Strong","x":94.31999969482422,"y":51.790000915527344},{"point_id":"P031","group":"Math Strong","x":88.29000091552734,"y":54.900001525878906},{"point_id":"P032","group":"Math Strong","x":88.12999725341797,"y":57.060001373291016},{"point_id":"P033","group":"Math Strong","x":90.30999755859375,"y":56.33000183105469},{"point_id":"P034","group":"Math Strong","x":91.58000183105469,"y":52.5},{"point_id":"P061","group":"English Strong","x":52.560001373291016,"y":86.36000061035156},{"point_id":"P062","group":"English Strong","x":51.52000045776367,"y":94.77999877929688},{"point_id":"P063","group":"English Strong","x":51.5,"y":93.0999984741211},{"point_id":"P064","group":"English Strong","x":52.939998626708984,"y":95.20999908447266},{"point_id":"P065","group":"English Strong","x":49.88999938964844,"y":91.66999816894531},{"point_id":"P066","group":"English Strong","x":59.70000076293945,"y":91.9000015258789},{"point_id":"P067","group":"English Strong","x":59.58000183105469,"y":93.20999908447266},{"point_id":"P068","group":"English Strong","x":53.7400016784668,"y":94.80000305175781},{"point_id":"P069","group":"English Strong","x":51.25,"y":88.81999969482422},{"point_id":"P070","group":"English Strong","x":57.369998931884766,"y":87.5999984741211},{"point_id":"P071","group":"English Strong","x":57.650001525878906,"y":91.5},{"point_id":"P072","group":"English Strong","x":55.470001220703125,"y":90.29000091552734},{"point_id":"P073","group":"English Strong","x":52.400001525878906,"y":91.3499984741211}],"50":[{"point_id":"P001","group":"High Both","x":88.93000030517578,"y":85.7300033569336},{"point_id":"P002","group":"High Both","x":88.4800033569336,"y":91.72000122070312},{"point_id":"P003","group":"High Both","x":86.02999877929688,"y":90.94000244140625},{"point_id":"P004","group":"High Both","x":90.2300033569336,"y":88.33000183105469},{"point_id":"P005","group":"High Both","x":90.16999816894531,"y":91.37999725341797},{"point_id":"P006","group":"High Both","x":88.94999694824219,"y":92.97000122070312},{"point_id":"P007","group":"High Both","x":87.44000244140625,"y":85.08000183105469},{"point_id":"P008","group":"High Both","x":84.55000305175781,"y":91.26000213623047},{"point_id":"P009","group":"High Both","x":91.79000091552734,"y":89.43000030517578},{"point_id":"P010","group":"High Both","x":92.19999694824219,"y":90.80999755859375},{"point_id":"P011","group":"High Both","x":90.77999877929688,"y":92.43000030517578},{"point_id":"P023","group":"Math Strong","x":88.45999908447266,"y":54.560001373291016},{"point_id":"P024","group":"Math Strong","x":91.20999908447266,"y":52.7400016784668},{"point_id":"P025","group":"Math Strong","x":88.5999984741211,"y":56.400001525878906},{"point_id":"P026","group":"Math Strong","x":94.30999755859375,"y":51.869998931884766},{"point_id":"P027","group":"Math Strong","x":93.43000030517578,"y":52.290000915527344},{"point_id":"P028","group":"Math Strong","x":89.13999938964844,"y":54.40999984741211},{"point_id":"P029","group":"Math Strong","x":90.69000244140625,"y":59.86000061035156},{"point_id":"P030","group":"Math Strong","x":94.31999969482422,"y":51.790000915527344},{"point_id":"P031","group":"Math Strong","x":88.29000091552734,"y":54.900001525878906},{"point_id":"P032","group":"Math Strong","x":88.12999725341797,"y":57.060001373291016},{"point_id":"P033","group":"Math Strong","x":90.30999755859375,"y":56.33000183105469},{"point_id":"P034","group":"Math Strong","x":91.58000183105469,"y":52.5},{"point_id":"P035","group":"Math Strong","x":95.12999725341797,"y":56.650001525878906},{"point_id":"P036","group":"Math Strong","x":86.61000061035156,"y":52.459999084472656},{"point_id":"P061","group":"English Strong","x":52.560001373291016,"y":86.36000061035156},{"point_id":"P062","group":"English Strong","x":51.52000045776367,"y":94.77999877929688},{"point_id":"P063","group":"English Strong","x":51.5,"y":93.0999984741211},{"point_id":"P064","group":"English Strong","x":52.939998626708984,"y":95.20999908447266},{"point_id":"P065","group":"English Strong","x":49.88999938964844,"y":91.66999816894531},{"point_id":"P066","group":"English Strong","x":59.70000076293945,"y":91.9000015258789},{"point_id":"P067","group":"English Strong","x":59.58000183105469,"y":93.20999908447266},{"point_id":"P068","group":"English Strong","x":53.7400016784668,"y":94.80000305175781},{"point_id":"P069","group":"English Strong","x":51.25,"y":88.81999969482422},{"point_id":"P070","group":"English Strong","x":57.369998931884766,"y":87.5999984741211},{"point_id":"P071","group":"English Strong","x":57.650001525878906,"y":91.5},{"point_id":"P072","group":"English Strong","x":55.470001220703125,"y":90.29000091552734},{"point_id":"P073","group":"English Strong","x":52.400001525878906,"y":91.3499984741211},{"point_id":"P074","group":"English Strong","x":57.209999084472656,"y":91.83999633789062},{"point_id":"P075","group":"English Strong","x":58.599998474121094,"y":94.54000091552734},{"point_id":"P076","group":"English Strong","x":58.290000915527344,"y":92.61000061035156},{"point_id":"P077","group":"English Strong","x":58.25,"y":89.41999816894531},{"point_id":"P078","group":"English Strong","x":55.06999969482422,"y":90.94999694824219},{"point_id":"P079","group":"English Strong","x":55.029998779296875,"y":95.48999786376953},{"point_id":"P080","group":"English Strong","x":52.939998626708984,"y":89.63999938964844},{"point_id":"P081","group":"English Strong","x":53.40999984741211,"y":89.30000305175781},{"point_id":"P082","group":"English Strong","x":51.619998931884766,"y":89.48999786376953},{"point_id":"P083","group":"English Strong","x":55.38999938964844,"y":87.91000366210938},{"point_id":"P084","group":"English Strong","x":54.20000076293945,"y":92.19000244140625},{"point_id":"P085","group":"English Strong","x":59.72999954223633,"y":91.75}],"100":[{"point_id":"P001","group":"High Both","x":88.93000030517578,"y":85.7300033569336},{"point_id":"P002","group":"High Both","x":88.4800033569336,"y":91.72000122070312},{"point_id":"P003","group":"High Both","x":86.02999877929688,"y":90.94000244140625},{"point_id":"P004","group":"High Both","x":90.2300033569336,"y":88.33000183105469},{"point_id":"P005","group":"High Both","x":90.16999816894531,"y":91.37999725341797},{"point_id":"P006","group":"High Both","x":88.94999694824219,"y":92.97000122070312},{"point_id":"P007","group":"High Both","x":87.44000244140625,"y":85.08000183105469},{"point_id":"P008","group":"High Both","x":84.55000305175781,"y":91.26000213623047},{"point_id":"P009","group":"High Both","x":91.79000091552734,"y":89.43000030517578},{"point_id":"P010","group":"High Both","x":92.19999694824219,"y":90.80999755859375},{"point_id":"P011","group":"High Both","x":90.77999877929688,"y":92.43000030517578},{"point_id":"P012","group":"Low Both","x":46.45000076293945,"y":44.45000076293945},{"point_id":"P013","group":"Low Both","x":50.97999954223633,"y":44.58000183105469},{"point_id":"P014","group":"Low Both","x":49.83000183105469,"y":49.40999984741211},{"point_id":"P015","group":"Low Both","x":48.90999984741211,"y":53.5},{"point_id":"P016","group":"Low Both","x":52.27000045776367,"y":49.810001373291016},{"point_id":"P017","group":"Low Both","x":44.630001068115234,"y":51.75},{"point_id":"P018","group":"Low Both","x":47.65999984741211,"y":50.95000076293945},{"point_id":"P019","group":"Low Both","x":53.380001068115234,"y":48.279998779296875},{"point_id":"P020","group":"Low Both","x":47.34000015258789,"y":53.22999954223633},{"point_id":"P021","group":"Low Both","x":48.52000045776367,"y":53.099998474121094},{"point_id":"P022","group":"Low Both","x":44.560001373291016,"y":47.220001220703125},{"point_id":"P023","group":"Math Strong","x":88.45999908447266,"y":54.560001373291016},{"point_id":"P024","group":"Math Strong","x":91.20999908447266,"y":52.7400016784668},{"point_id":"P025","group":"Math Strong","x":88.5999984741211,"y":56.400001525878906},{"point_id":"P026","group":"Math Strong","x":94.30999755859375,"y":51.869998931884766},{"point_id":"P027","group":"Math Strong","x":93.43000030517578,"y":52.290000915527344},{"point_id":"P028","group":"Math Strong","x":89.13999938964844,"y":54.40999984741211},{"point_id":"P029","group":"Math Strong","x":90.69000244140625,"y":59.86000061035156},{"point_id":"P030","group":"Math Strong","x":94.31999969482422,"y":51.790000915527344},{"point_id":"P031","group":"Math Strong","x":88.29000091552734,"y":54.900001525878906},{"point_id":"P032","group":"Math Strong","x":88.12999725341797,"y":57.060001373291016},{"point_id":"P033","group":"Math Strong","x":90.30999755859375,"y":56.33000183105469},{"point_id":"P034","group":"Math Strong","x":91.58000183105469,"y":52.5},{"point_id":"P035","group":"Math Strong","x":95.12999725341797,"y":56.650001525878906},{"point_id":"P036","group":"Math Strong","x":86.61000061035156,"y":52.459999084472656},{"point_id":"P037","group":"Math Strong","x":89.26000213623047,"y":50.09000015258789},{"point_id":"P038","group":"Math Strong","x":86.7300033569336,"y":55.66999816894531},{"point_id":"P039","group":"Math Strong","x":93.91999816894531,"y":54.52000045776367},{"point_id":"P040","group":"Math Strong","x":91.45999908447266,"y":52.650001525878906},{"point_id":"P041","group":"Math Strong","x":92.62999725341797,"y":53.189998626708984},{"point_id":"P042","group":"Math Strong","x":90.11000061035156,"y":52.939998626708984},{"point_id":"P043","group":"Math Strong","x":91.45999908447266,"y":55.2400016784668},{"point_id":"P044","group":"Math Strong","x":93.06999969482422,"y":59.43000030517578},{"point_id":"P045","group":"Math Strong","x":92.58000183105469,"y":55.130001068115234},{"point_id":"P046","group":"Math Strong","x":92.11000061035156,"y":54.459999084472656},{"point_id":"P047","group":"Math Strong","x":87.12000274658203,"y":51.91999816894531},{"point_id":"P048","group":"Math Strong","x":93.11000061035156,"y":52.619998931884766},{"point_id":"P049","group":"Math Strong","x":94.79000091552734,"y":58.22999954223633},{"point_id":"P050","group":"Math Strong","x":93.47000122070312,"y":55.41999816894531},{"point_id":"P051","group":"Math Strong","x":90.9000015258789,"y":57.81999969482422},{"point_id":"P052","group":"Math Strong","x":89.58999633789062,"y":51.36000061035156},{"point_id":"P053","group":"Math Strong","x":89.54000091552734,"y":59.380001068115234},{"point_id":"P054","group":"Math Strong","x":86.4000015258789,"y":52.369998931884766},{"point_id":"P055","group":"Math Strong","x":90.80999755859375,"y":53.220001220703125},{"point_id":"P056","group":"Math Strong","x":95.73999786376953,"y":57.040000915527344},{"point_id":"P057","group":"Math Strong","x":89.9800033569336,"y":53.2599983215332},{"point_id":"P058","group":"Math Strong","x":88.18000030517578,"y":50.709999084472656},{"point_id":"P059","group":"Math Strong","x":88.2300033569336,"y":55.720001220703125},{"point_id":"P060","group":"Math Strong","x":91.13999938964844,"y":57.38999938964844},{"point_id":"P061","group":"English Strong","x":52.560001373291016,"y":86.36000061035156},{"point_id":"P062","group":"English Strong","x":51.52000045776367,"y":94.77999877929688},{"point_id":"P063","group":"English Strong","x":51.5,"y":93.0999984741211},{"point_id":"P064","group":"English Strong","x":52.939998626708984,"y":95.20999908447266},{"point_id":"P065","group":"English Strong","x":49.88999938964844,"y":91.66999816894531},{"point_id":"P066","group":"English Strong","x":59.70000076293945,"y":91.9000015258789},{"point_id":"P067","group":"English Strong","x":59.58000183105469,"y":93.20999908447266},{"point_id":"P068","group":"English Strong","x":53.7400016784668,"y":94.80000305175781},{"point_id":"P069","group":"English Strong","x":51.25,"y":88.81999969482422},{"point_id":"P070","group":"English Strong","x":57.369998931884766,"y":87.5999984741211},{"point_id":"P071","group":"English Strong","x":57.650001525878906,"y":91.5},{"point_id":"P072","group":"English Strong","x":55.470001220703125,"y":90.29000091552734},{"point_id":"P073","group":"English Strong","x":52.400001525878906,"y":91.3499984741211},{"point_id":"P074","group":"English Strong","x":57.209999084472656,"y":91.83999633789062},{"point_id":"P075","group":"English Strong","x":58.599998474121094,"y":94.54000091552734},{"point_id":"P076","group":"English Strong","x":58.290000915527344,"y":92.61000061035156},{"point_id":"P077","group":"English Strong","x":58.25,"y":89.41999816894531},{"point_id":"P078","group":"English Strong","x":55.06999969482422,"y":90.94999694824219},{"point_id":"P079","group":"English Strong","x":55.029998779296875,"y":95.48999786376953},{"point_id":"P080","group":"English Strong","x":52.939998626708984,"y":89.63999938964844},{"point_id":"P081","group":"English Strong","x":53.40999984741211,"y":89.30000305175781},{"point_id":"P082","group":"English Strong","x":51.619998931884766,"y":89.48999786376953},{"point_id":"P083","group":"English Strong","x":55.38999938964844,"y":87.91000366210938},{"point_id":"P084","group":"English Strong","x":54.20000076293945,"y":92.19000244140625},{"point_id":"P085","group":"English Strong","x":59.72999954223633,"y":91.75},{"point_id":"P086","group":"English Strong","x":52.2599983215332,"y":91.8499984741211},{"point_id":"P087","group":"English Strong","x":58.93000030517578,"y":94.11000061035156},{"point_id":"P088","group":"English Strong","x":56.029998779296875,"y":92.61000061035156},{"point_id":"P089","group":"English Strong","x":51.81999969482422,"y":94.04000091552734},{"point_id":"P090","group":"English Strong","x":58.599998474121094,"y":87.5},{"point_id":"P091","group":"English Strong","x":54.540000915527344,"y":91.69000244140625},{"point_id":"P092","group":"English Strong","x":54.52000045776367,"y":91.0},{"point_id":"P093","group":"English Strong","x":50.2599983215332,"y":88.75},{"point_id":"P094","group":"English Strong","x":58.04999923706055,"y":92.16000366210938},{"point_id":"P095","group":"English Strong","x":55.029998779296875,"y":93.54000091552734},{"point_id":"P096","group":"English Strong","x":56.81999969482422,"y":93.63999938964844},{"point_id":"P097","group":"English Strong","x":56.099998474121094,"y":95.48999786376953},{"point_id":"P098","group":"English Strong","x":57.130001068115234,"y":95.66000366210938},{"point_id":"P099","group":"English Strong","x":52.29999923706055,"y":93.33000183105469},{"point_id":"P100","group":"English Strong","x":59.58000183105469,"y":89.95999908447266}]};
+let lastState=null,activeRun=null,busy=false,requestPending=false,inputSignature='',demo=null,lastCompute=null,pollInFlight=false,requestGeneration=0,previewMode=false;
+const pairColors={NN:'rgb(93,205,170)',MN:'rgb(255,171,56)',FP:'rgb(110,181,232)'},anchorColor='rgb(147,89,190)';
+const ns='http://www.w3.org/2000/svg';
+function node(tag,attrs={},text=''){const n=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));if(text)n.textContent=text;return n;}
+function lock(value){busy=value;for(const id of ['variant','n','seed','start'])$(id).disabled=value;$('start').textContent=value?'Training…':'Start training';}
+function setEpoch(epoch){$('progress').value=epoch;$('epoch-count').textContent=`Epoch ${epoch} / 450`;}
+function messageError(message){$('error').textContent=message;$('error').hidden=!message;}
+function plot(id,points,xy,origins,axisX,axisY,style={}){
+ const svg=$(id);svg.replaceChildren();const W=720,L=80,R=28,T=18,B=50;let H=620;
+ if(!xy){svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('width',W);svg.setAttribute('height',H);svg.style.setProperty?.('--plot-ratio',String(W/H));svg.setAttribute('preserveAspectRatio','xMidYMid meet');svg.append(node('text',{x:W/2,y:H/2,'text-anchor':'middle',class:'empty'},id==='input'?'Start a run to load its fixed dataset.':'Waiting for actual training output.'));return;}
+ // Fit true input/current numeric coordinates only, with equal scale on both axes.
+ const all=origins?[...xy,...origins]:xy;
+ let xmin=Math.min(...all.map(v=>v[0])),xmax=Math.max(...all.map(v=>v[0])),ymin=Math.min(...all.map(v=>v[1])),ymax=Math.max(...all.map(v=>v[1]));
+ // Adapt the viewport's shape rather than stretching the data or padding a
+ // wide range into a tall square. Modest limits keep degenerate cases usable.
+ H=Math.round(Math.max(320,Math.min(820,(W-L-R)*(ymax-ymin)/Math.max(xmax-xmin,.01)+T+B)));
+ svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('width',W);svg.setAttribute('height',H);svg.style.setProperty?.('--plot-ratio',String(W/H));svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+ const cx=(xmin+xmax)/2,cy=(ymin+ymax)/2,areaW=W-L-R,areaH=H-T-B;
+ const span=Math.max(xmax-xmin,(ymax-ymin)*areaW/areaH,.01)*1.055;
+ xmin=cx-span/2;xmax=cx+span/2;const yspan=span*areaH/areaW;ymin=cy-yspan/2;ymax=cy+yspan/2;
+ for(const[k,v]of Object.entries({xmin,xmax,ymin,ymax,left:L,right:W-R,top:T,bottom:H-B}))svg.setAttribute(`data-${k}`,v);
+ const px=x=>L+(x-xmin)/(xmax-xmin)*areaW,py=y=>H-B-(y-ymin)/(ymax-ymin)*areaH;
+ for(let i=0;i<=4;i++){
+  const x=xmin+(xmax-xmin)*i/4,y=ymin+(ymax-ymin)*i/4;
+  svg.append(node('line',{x1:px(x),x2:px(x),y1:T,y2:H-B,stroke:'#eef2ef'}),node('line',{x1:L,x2:W-R,y1:py(y),y2:py(y),stroke:'#eef2ef'}));
+  svg.append(node('text',{x:px(x),y:H-B+18,'text-anchor':'middle',class:'raw'},x.toFixed(1)),node('text',{x:L-8,y:py(y)+3,'text-anchor':'end',class:'raw'},y.toFixed(1)));
+ }
+ svg.append(node('line',{x1:L,x2:W-R,y1:H-B,y2:H-B,stroke:'#a8bdb0'}),node('line',{x1:L,x2:L,y1:T,y2:H-B,stroke:'#a8bdb0'}));
+ svg.append(node('text',{x:(L+W-R)/2,y:H-12,'text-anchor':'middle',class:'axis'},axisX),node('text',{transform:`translate(15 ${(T+H-B)/2}) rotate(-90)`,'text-anchor':'middle',class:'axis'},axisY));
+ const endpoints=xy.map(v=>[px(v[0]),py(v[1])]);
+ if(origins){
+  // Correspondence lines extend fully between both dot centers, without tips.
+  points.forEach((p,i)=>{
+   const color=palette[p.group]||'#68786f',a=[px(origins[i][0]),py(origins[i][1])],b=endpoints[i];
+   svg.append(node('line',{'data-role':'correspondence','data-point-id':p.point_id,'data-origin-x':origins[i][0],'data-origin-y':origins[i][1],'data-target-x':xy[i][0],'data-target-y':xy[i][1],x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:color,'stroke-opacity':.24,'stroke-width':.8}));
+  });
+  points.forEach((p,i)=>{
+   const c=node('circle',{'data-role':'original-input','data-point-id':p.point_id,'data-x':origins[i][0],'data-y':origins[i][1],cx:px(origins[i][0]),cy:py(origins[i][1]),r:3.2,fill:palette[p.group]||'#68786f','fill-opacity':.035,stroke:palette[p.group]||'#68786f','stroke-opacity':.23,'stroke-width':.9});
+   c.append(node('title',{},`${p.point_id} - true original ${p.group}\nMath ${origins[i][0].toFixed(3)}, English ${origins[i][1].toFixed(3)}`));svg.append(c);
+  });
+ }
+ points.forEach((p,i)=>{
+  const c=node('circle',{'data-role':style.neutral?'selection-point':id==='output'?'current-output':'input-point','data-point-id':p.point_id,'data-x':xy[i][0],'data-y':xy[i][1],cx:endpoints[i][0],cy:endpoints[i][1],r:2.4,fill:style.neutral?'#242b28':palette[p.group]||'#68786f','fill-opacity':1,stroke:'#fff','stroke-width':.5});
+  c.append(node('title',{},`${p.point_id} - ${p.group}\n(${xy[i][0].toFixed(3)}, ${xy[i][1].toFixed(3)})`));svg.append(c);
+ });
+ if($('labels').checked){
+  const occupied=endpoints.map(([x,y])=>({x:x-4,y:y-4,w:8,h:8}));
+  const overlaps=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+  points.forEach((p,i)=>{
+   const[x,y]=endpoints[i],w=p.point_id.length*4.5+3,h=10;
+   for(const[dx,dy]of [[6,-7],[-w-6,-7],[6,16],[-w-6,16],[6,4],[-w-6,4]]){
+    const box={x:x+dx,y:y+dy-h,w,h};
+    if(box.x<L||box.x+w>W-R||box.y<T||box.y+h>H-B||occupied.some(b=>overlaps(box,b)))continue;
+    svg.append(node('text',{'data-point-id':p.point_id,x:box.x,y:box.y+h-1,class:'ids'},p.point_id));occupied.push(box);break;
+   }
+  });
+ }
+}
+function fixedInput(points){
+ const signature=JSON.stringify([$('labels').checked,points]);
+ if(signature===inputSignature)return;
+ inputSignature=signature;
+ plot('input',points,points.map(p=>[p.x,p.y]),null,'Math score','English score');
+ $('legend').replaceChildren();
+ for(const group of [...new Set(points.map(p=>p.group))]){const key=document.createElement('span');key.className='key';const dot=document.createElement('span');dot.className='swatch';dot.style.background=palette[group]||'#68786f';key.append(dot,document.createTextNode(`${group} (${points.filter(p=>p.group===group).length})`));$('legend').append(key);}
+}
+function panelPhase(selection){$('training-key').hidden=selection;$('selection-key').hidden=!selection;}
+function neutralOutput(points,event=null){
+ fixedInput(points);panelPhase(true);
+ $('output-title').textContent='Actual pair selection';
+ $('embedding-caption').textContent='One purple anchor at a time. All actual NN (green), MN (gold), and FP (blue) partners appear together. Multiple colored rings retain overlapping memberships; repeated slots remain in the counts.';
+ plot('output',points,points.map(p=>[p.x,p.y]),null,'Math score (pair selection)','English score (pair selection)',{neutral:true});
+ $('output').setAttribute('aria-label','Actual pair selection at original input score positions');
+ if(!event)return;
+ const svg=$('output'),v=k=>Number(svg.getAttribute(`data-${k}`));
+ const px=x=>v('left')+(x-v('xmin'))/(v('xmax')-v('xmin'))*(v('right')-v('left'));
+ const py=y=>v('bottom')-(y-v('ymin'))/(v('ymax')-v('ymin'))*(v('bottom')-v('top'));
+ const a=points[event.source],ax=px(a.x),ay=py(a.y),members=new Map();
+ for(const [family,color]of Object.entries(pairColors)){
+  const counts=new Map();for(const target of event.groups[family])counts.set(target,(counts.get(target)||0)+1);
+  for(const [target,slots]of counts){
+   if(!members.has(target))members.set(target,[]);members.get(target).push({family,color,slots});
+   const b=points[target],bx=px(b.x),by=py(b.y),line=node('path',{'data-role':'selected-pair','data-family':family,'data-source-id':a.point_id,'data-target-id':b.point_id,'data-slots':slots,fill:'none',stroke:color,'stroke-width':1.4,'stroke-opacity':.85});
+   const dx=bx-ax,dy=by-ay,length=Math.hypot(dx,dy),offset=({NN:-5,MN:0,FP:5})[family];
+   line.setAttribute('d',length>0?`M${ax} ${ay}Q${(ax+bx)/2-dy/length*offset} ${(ay+by)/2+dx/length*offset} ${bx} ${by}`:`M${ax} ${ay}m0 -11a11 11 0 1 1 -.01 0`);
+   line.append(node('title',{},`${a.point_id} → ${b.point_id}: ${family}, ${slots} selected slot${slots===1?'':'s'}`));svg.append(line);
+  }
+ }
+ // Independent rings retain every family, including overlap and self-membership.
+ for(const [target,roles]of members){
+  const p=points[target];roles.forEach(({family,color,slots},i)=>{
+   const ring=node('circle',{'data-role':'selected-target','data-point-id':p.point_id,'data-family':family,'data-slots':slots,cx:px(p.x),cy:py(p.y),r:(target===event.source?7:4)+i*2.2,fill:roles.length===1&&target!==event.source?color:'none',stroke:color,'stroke-width':1.8});
+   ring.append(node('title',{},`${p.point_id}: ${family} (${slots} slots); memberships ${roles.map(r=>r.family).join(' + ')}`));svg.append(ring);
+  });
+ }
+ const source=node('circle',{'data-role':'active-source','data-point-id':a.point_id,cx:ax,cy:ay,r:5,fill:anchorColor,stroke:'#fff','stroke-width':1});source.append(node('title',{},`${a.point_id}: current anchor`));svg.append(source);
+}
+function preview(){const points=previewDatasets[$('n').value];neutralOutput(points);setEpoch(0);$('status').textContent='Ready — input already loaded';$('detail').textContent=`450 epochs · 10 NN / 5 MN / 20 FP · target ≈${$('seconds').value||90} s`;$('phase-note').textContent='Start records real pairs. Each purple anchor shows all NN, MN and FP partners together; input positions and group colors stay fixed.';}
+function render(s){
+ lastState=s;const p=s.points||[];if(!p.length)return;
+ fixedInput(p);panelPhase(false);$('output-title').textContent='Actual model embedding';
+ $('output').setAttribute('aria-label','True original scores and actual raw model outputs on shared numeric axes');
+ $('embedding-caption').textContent='Faint rings: true original scores. Solid dots: current raw embedding. Faint lines connect the same point ID; neither coordinate set is aligned or transformed.';
+ plot('output',p,s.coordinates,p.map(v=>[v.x,v.y]),'Numeric x: input Math / raw embedding 1','Numeric y: input English / raw embedding 2');
+}
+function duration(){const seconds=Number($('seconds').value);if(!Number.isFinite(seconds)||seconds<=0)throw Error('Enter a positive estimated duration in seconds.');return seconds;}
+function beginDemo(id,start=performance.now()){
+ demo={id,start,target:duration(),mode:'waiting',trace:null,events:[],step:0,frames:new Map(),fetched:-1,nextEpoch:0,nextAt:0,interval:0,currentEvent:null,displayed:null};
+ activeRun=id;previewMode=false;lock(true);
+}
+function buildPairEvents(trace){
+ const anchors=Array.from({length:trace.n},(_,source)=>({kind:'anchor',source,groups:{NN:[],MN:[],FP:[]}}));
+ for(const family of Object.keys(pairColors))for(const [source,target]of trace.pairs[family])anchors[source].groups[family].push(target);
+ return anchors;
+}
+function replan(now=performance.now()){
+ if(!demo)return;
+ const remaining=Math.max(0,demo.start+demo.target*1000-now);
+ if(demo.mode==='pairs')demo.interval=Math.max(16,remaining*.32/Math.max(1,demo.events.length-demo.step));
+ if(demo.mode==='frames')demo.interval=Math.max(16,remaining/Math.max(1,451-demo.nextEpoch));
+ demo.nextAt=now;
+}
+function computeDetail(now){const s=lastCompute||{},elapsed=demo?(now-demo.start)/1000:0,compute=s.status==='completed'?s.elapsed_seconds||0:s.compute_started_at?Math.max(0,Date.now()/1000-s.compute_started_at):s.elapsed_seconds||0;return `compute ${s.epoch||0}/450 (${compute.toFixed(1)} s) · demo ${elapsed.toFixed(1)} s · target ≈${demo?demo.target:duration()} s`;}
+function tick(now=performance.now()){
+ if(!demo||demo.mode==='complete'||demo.mode==='error')return;
+ $('detail').textContent=computeDetail(now);
+ if(demo.mode==='waiting'){
+  $('status').textContent=lastCompute?.stage==='selecting_pairs'?'Computing real pairs':'Preparing libraries / numerical sampler';
+  $('phase-note').textContent='Input is ready. Waiting for genuine sampler results; no candidate-search steps are animated.';
+  if(!demo.trace)return;
+  demo.events=buildPairEvents(demo.trace);demo.mode='pairs';replan(now);
+ }
+ if(now<demo.nextAt)return;
+ if(demo.mode==='pairs'){
+  if(demo.step<demo.events.length){
+   const event=demo.events[demo.step++];demo.currentEvent=event;neutralOutput(lastCompute.points,event);
+   const source=lastCompute.points[event.source].point_id;
+   const counts=Object.fromEntries(Object.entries(event.groups).map(([family,targets])=>[family,targets.length]));
+   $('status').textContent=`Anchor ${source}: NN ${counts.NN} · MN ${counts.MN} · FP ${counts.FP}`;
+   $('phase-note').textContent=`Anchor ${demo.step}/${demo.events.length}. All true selected partners are shown together from the actual sampler arrays. Multi-rings and separate colored connections retain overlapping families; counts retain duplicate slots. This is paced recorded selection replay, not internal search animation.`;
+   demo.nextAt=now+demo.interval;return;
+  }
+  demo.mode='frames';replan(now);
+ }
+ if(demo.mode==='frames'){
+  const frame=demo.frames.get(demo.nextEpoch);
+  if(frame){
+   demo.displayed={...lastCompute,coordinates:frame.coordinates,epoch:frame.epoch};render(demo.displayed);
+   setEpoch(frame.epoch);$('status').textContent=`Actual recorded epoch ${frame.epoch} / 450`;
+   $('phase-note').textContent='Steady replay of genuine initial + post-epoch states, in order. No interpolation. Computation runs independently; preparation or a short target can make the demo run longer than the estimate.';
+   demo.nextEpoch++;demo.nextAt=now+demo.interval;
+  }else if(demo.nextEpoch<451){$('status').textContent=`Waiting for actual epoch ${demo.nextEpoch}`;}
+  if(demo.nextEpoch===451&&lastCompute?.status==='completed'){
+   demo.mode='complete';lock(false);$('status').textContent='Demo complete — epoch 450 / 450';
+   $('phase-note').textContent='All 451 actual model states were displayed in order. Start runs the selected implementation again; Reset / stop returns to neutral input positions.';
+  }
+ }
+}
+async function replayData(generation){
+ const id=demo.id;
+ if(!demo.trace){const response=await fetch(`/api/pairs?run_id=${encodeURIComponent(id)}`);if(!response.ok&&response.status!==202)throw Error('Restart the local server to load the new pair-replay endpoints.');const result=await response.json();if(generation!==requestGeneration||demo?.id!==id)return;if(result.ready)demo.trace=result.trace;}
+ const response=await fetch(`/api/frames?run_id=${encodeURIComponent(id)}&after=${demo.fetched}`);if(!response.ok)throw Error('Could not fetch actual epoch frames.');const result=await response.json();if(generation!==requestGeneration||demo?.id!==id)return;
+ for(const frame of result.frames){if(frame.epoch!==demo.fetched+1)throw Error('Epoch stream is not contiguous; no interpolated replacement is allowed.');demo.frames.set(frame.epoch,frame);demo.fetched=frame.epoch;}
+}
+async function poll(){
+ if(pollInFlight)return;pollInFlight=true;const generation=requestGeneration;
+ try{
+  const response=await fetch('/api/status');if(!response.ok)throw Error(`Status unavailable (${response.status}).`);const s=await response.json();if(generation!==requestGeneration)return;
+  if(s.status==='idle'){if(!requestPending&&!demo){lock(false);$('status').textContent='Ready — input already loaded';}return;}
+  if(previewMode)return;
+  if(activeRun&&s.run_id&&s.run_id!==activeRun)return;
+  const current=demo&&(!s.run_id||s.run_id===demo.id);
+  lastCompute=current?{...lastCompute,...s,points:s.points||lastCompute?.points}:s;
+  if(s.status==='error'){if(demo)demo.mode='error';lock(false);$('status').textContent='Training stopped';messageError(s.error||'Training failed; inspect the run log.');return;}
+  if(!s.replay_version&&!current){
+   activeRun=s.run_id;if(s.n)$('n').value=String(s.n);lock(s.status!=='completed');if(s.points&&s.coordinates)render(s);
+   setEpoch(s.epoch||0);$('status').textContent=`${s.status==='completed'?'Completed':'Computing'} — epoch ${s.epoch||0} /450`;
+   $('phase-note').textContent='Existing run preserved. Restart the local server to enable the new pair/cadence demo.';return;
+  }
+  if(!demo||demo.id!==s.run_id){if(s.n)$('n').value=String(s.n);beginDemo(s.run_id);neutralOutput(s.points||previewDatasets[$('n').value]);}
+  if(demo.mode!=='complete')await replayData(generation);
+ }catch(error){messageError(`Local server: ${error.message}`);}finally{pollInFlight=false;}
+}
+$('start').addEventListener('click',async()=>{
+ if(busy||requestPending)return;
+ const seed=Number($('seed').value);if(!Number.isInteger(seed)||seed<0||seed>=2147383648){messageError('Enter an integer seed from 0 through 2147383647.');return;}
+ try{duration();}catch(error){messageError(error.message);return;}
+ messageError('');requestPending=true;requestGeneration++;const generation=requestGeneration,start=performance.now();lock(true);previewMode=false;demo=null;activeRun=null;preview();$('status').textContent='Starting actual computation';
+ try{
+  const response=await fetch('/api/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({variant:$('variant').value,n:Number($('n').value),seed})});const result=await response.json();if(generation!==requestGeneration)return;
+  if(!response.ok)throw Error(result.error||`Start failed (${response.status}).`);beginDemo(result.run_id,start);await poll();
+ }catch(error){messageError(error.message);lock(false);$('status').textContent='Could not start';}finally{requestPending=false;}
+});
+$('reset').addEventListener('click',async()=>{
+ if(requestPending)return;requestPending=true;requestGeneration++;
+ try{const response=await fetch('/api/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const result=await response.json();if(!response.ok)throw Error(result.error||'Restart the server to enable Reset / stop.');activeRun=null;demo=null;lastCompute=null;previewMode=true;messageError('');lock(false);preview();}
+ catch(error){messageError(error.message);}finally{requestPending=false;}
+});
+for(const id of['variant','n','seed'])$(id).addEventListener('change',()=>{if(!busy){previewMode=true;demo=null;lastState=null;preview();}});
+function applyDuration(){try{const seconds=duration();if(demo){demo.target=seconds;replan();$('detail').textContent=computeDetail(performance.now());}messageError('');}catch(error){messageError(error.message);}}
+$('seconds').addEventListener('input',applyDuration);$('seconds').addEventListener('change',applyDuration);
+$('labels').addEventListener('change',()=>{inputSignature='';if(demo?.mode==='pairs')neutralOutput(lastCompute.points,demo.currentEvent);else if(lastState&&demo?.displayed)render(demo.displayed);else if(lastState&&!demo)render(lastState);else preview();});
+$('labels').checked=false;preview();poll();setInterval(poll,200);
+function animation(now){try{tick(now);}catch(error){if(demo)demo.mode='error';lock(false);messageError(`Replay stopped: ${error.message}`);}finally{requestAnimationFrame(animation);}}requestAnimationFrame(animation);
+</script>
+</html>
